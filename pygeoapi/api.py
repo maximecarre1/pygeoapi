@@ -1670,6 +1670,16 @@ class API:
             content = geojson2jsonld(
                 self.config, content, dataset, id_field=(p.uri_field or 'id')
             )
+        else:
+            formatters_config = filter_dict_by_key_value(
+            self.config['resources'], 'type', 'formatter'
+        )
+            if request.format not in formatters_config:
+                ## Error message goes here, Need to implement NoSuchFormatter
+                pass
+
+            formatter = load_plugin('process',
+                              formatters_config[request.format]['formatter'])
 
         return headers, HTTPStatus.OK, to_json(content, self.pretty_print)
 
@@ -1688,8 +1698,12 @@ class API:
         """
 
         request_headers = request.headers
+        valid_formatters_plugins = filter_dict_by_key_value(
+            self.config['resources'], 'type', 'formatter') 
+        + PLUGINS['formatter'].keys()
 
-        if not request.is_valid(PLUGINS['formatter'].keys()):
+
+        if not request.is_valid(valid_formatters_plugins):
             return self.get_format_exception(request)
 
         # Set Content-Language to system locale until provider locale
