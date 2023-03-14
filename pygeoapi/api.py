@@ -307,6 +307,11 @@ class APIRequest:
         # Determine format
         self._format = self._get_format(request.headers)
 
+        # Get Valid formatters plugins from config
+        valid_formatters_plugins = filter_dict_by_key_value(
+            self.config['resources'], 'type', 'formatter') 
+        + PLUGINS['formatter'].keys()
+
         # Get received headers
         self._headers = self.get_request_headers(request.headers)
 
@@ -1312,7 +1317,7 @@ class API:
         :returns: tuple of headers, status code, content
         """
 
-        if not request.is_valid(PLUGINS['formatter'].keys()):
+        if not request.is_valid(self.valid_formatters_plugins):
             return self.get_format_exception(request)
 
         # Set Content-Language to system locale until provider locale
@@ -1697,13 +1702,7 @@ class API:
         :returns: tuple of headers, status code, content
         """
 
-        request_headers = request.headers
-        valid_formatters_plugins = filter_dict_by_key_value(
-            self.config['resources'], 'type', 'formatter') 
-        + PLUGINS['formatter'].keys()
-
-
-        if not request.is_valid(valid_formatters_plugins):
+        if not request.is_valid(self.valid_formatters_plugins):
             return self.get_format_exception(request)
 
         # Set Content-Language to system locale until provider locale
@@ -1997,7 +1996,7 @@ class API:
         :returns: tuple of headers, status code, content
         """
 
-        if not request.is_valid(PLUGINS['formatter'].keys()):
+        if not request.is_valid(self.valid_formatters_plugins):
             return self.get_format_exception(request)
 
         # Set Content-Language to system locale until provider locale
@@ -3574,7 +3573,7 @@ class API:
         :returns: tuple of headers, status code, content
         """
 
-        if not request.is_valid(PLUGINS['formatter'].keys()):
+        if not request.is_valid(self.valid_formatters_plugins):
             return self.get_format_exception(request)
         headers = request.get_response_headers(self.default_locale)
 
