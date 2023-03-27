@@ -302,3 +302,8 @@ resources:
         type: process
         processor:
             name: HelloWorld
+
+    test:
+        type: formatter
+        formatter:
+            name: formatter.test_
